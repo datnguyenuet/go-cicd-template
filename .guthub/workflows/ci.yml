@@ -1,0 +1,40 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [ '*' ]
+  pull_request:
+    types: [ opened, edited, reopened, synchronize, review_requested ]
+    branches: [ '*' ]
+  workflow_call:
+
+env:
+  GO_VERSIONS: [ '1.21', 'oldstable', 'stable' ]
+  FLAG: unittests
+  CODECOV_NAME: generic
+  FAIL_CI_IF_ERROR: true
+
+jobs:
+  Test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go: ${{ env.GO_VERSIONS }}
+    name: Run tests with Go ${{ matrix.go }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ matrix.go }}
+      - name: Run tests
+        run: |
+          go version
+          go test -v -timeout 9999s -count 1 -p 1 -cover -coverprofile coverage.txt .
+      - name: Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          flags: ${{ env.FLAG }}
+          name: ${{ env.CODECOV_NAME }}
+          fail_ci_if_error: ${{ env.FAIL_CI_IF_ERROR }}
