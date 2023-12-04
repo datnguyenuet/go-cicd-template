@@ -5,11 +5,6 @@ on:
     types: [ closed ]
     branches: [ release ]
 
-env:
-  DOCKER_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-  DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-  DOCKER_REGISTRY: ${{ secrets.DOCKERHUB_REGISTRY }}
-
 jobs:
   RunCIJob:
     uses: ./.github/workflows/ci.yml
@@ -29,8 +24,8 @@ jobs:
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: $DOCKER_USERNAME
-          password: $DOCKER_TOKEN
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push
         uses: docker/build-push-action@v5
@@ -38,5 +33,5 @@ jobs:
           context: .
           push: true
           tags: |
-            $DOCKER_REGISTRY/go-cicd:latest
-            $DOCKER_REGISTRY/go-cicd:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_REGISTRY }}/go-cicd:latest
+            ${{ secrets.DOCKERHUB_REGISTRY }}/go-cicd:${{ github.sha }}
