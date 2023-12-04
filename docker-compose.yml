@@ -1,0 +1,10 @@
+version: "3.9"
+services:
+  app-service:
+    container_name: api
+    build:
+      context: .
+      target: dev
+    volumes:
+      - .:/app:rw,delegated
+    command: ["start"]
